@@ -1,0 +1,119 @@
+/* ================= Ретро-полировка: свечение, гравировка, износ, помехи ================= */
+:root {
+  --engrave: "Share Tech Mono", "SF Mono", Menlo, monospace;
+  --plate-font: "Michroma", "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
+/* ---------- Кинескоп: bloom, аберрация, помехи ---------- */
+.crt::before {                      /* ореол вокруг ярких точек: размытая копия экрана складывается с оригиналом */
+  content: "";
+  position: absolute; inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  border-radius: inherit;
+  backdrop-filter: blur(4px) brightness(1.7) saturate(1.3);
+  -webkit-backdrop-filter: blur(4px) brightness(1.7) saturate(1.3);
+  mix-blend-mode: screen;
+  opacity: .5;
+}
+.crt canvas {
+  filter: blur(.35px) contrast(1.1)
+          drop-shadow(1px 0 0 rgba(255,60,60,.22)) drop-shadow(-1px 0 0 rgba(60,255,255,.22));
+}
+.crt.bw canvas {
+  filter: blur(.6px) contrast(1.15) brightness(1.05)
+          drop-shadow(1px 0 0 rgba(255,60,60,.2)) drop-shadow(-1px 0 0 rgba(60,255,255,.2));
+}
+.crt-glass {                         /* сильнее заваливаем углы + стеклянная кромка */
+  background:
+    linear-gradient(160deg, rgba(255,255,255,.07) 0%, transparent 30%),
+    radial-gradient(ellipse at 50% 50%, transparent 48%, rgba(0,0,0,.68) 100%);
+  box-shadow: inset 0 0 70px rgba(0,0,0,.85), inset 0 0 0 1px rgba(255,255,255,.04);
+}
+.crt::after {                        /* полоса помехи */
+  content: "";
+  position: absolute; left: 0; right: 0; top: var(--ty, 50%);
+  z-index: 2;
+  height: 7px;
+  pointer-events: none;
+  background: linear-gradient(to bottom, transparent, rgba(170,255,210,.22), transparent);
+  opacity: 0;
+}
+.crt.tear::after { opacity: 1; }
+.crt.tear canvas { animation: crt-tear .09s steps(2) 1; }
+.crt.flash canvas { animation: crt-flash .16s ease-out 1; }
+@keyframes crt-tear {
+  0%   { transform: translateX(-4px) skewX(1.5deg); }
+  50%  { transform: translateX(5px); }
+  100% { transform: none; }
+}
+@keyframes crt-flash { 0% { filter: brightness(2.2) contrast(1.2); } 100% { filter: none; } }
+
+/* ---------- Гравировка и шрифты ---------- */
+.panel-title, .unit-name, .rack-caption, .power-caption, .ctl-cap, .hints, .brand-model {
+  font-family: var(--engrave);
+  text-shadow: 0 1px 0 rgba(255,255,255,.06), 0 -1px 0 rgba(0,0,0,.65);
+}
+.brand-model { white-space: nowrap; letter-spacing: .12em; }
+.brand-name {
+  font-family: var(--plate-font);
+  font-weight: 400;
+  letter-spacing: .38em;
+  text-shadow: 0 1px 0 rgba(255,255,255,.08), 0 -1px 0 rgba(0,0,0,.7);
+}
+
+/* ---------- Шильдики ---------- */
+.home-warn { flex-direction: column; gap: 22px; }
+.plates { display: flex; gap: 18px; flex-wrap: wrap; justify-content: center; }
+.nameplate {
+  --rivet: radial-gradient(circle at 40% 35%, #9a9d99 0 1px, #4a4d4b 2px 3px, rgba(0,0,0,.5) 3.5px, transparent 4px);
+  position: relative;
+  display: flex; flex-direction: column; gap: 4px;
+  min-width: 170px;
+  padding: 9px 18px 8px;
+  border-radius: 2px;
+  font: 600 8px/1.2 var(--engrave);
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  color: #2b2d2b;
+  background:
+    var(--rivet) 4px 50% / 8px 8px no-repeat,
+    var(--rivet) calc(100% - 4px) 50% / 8px 8px no-repeat,
+    linear-gradient(180deg, #a9aca6, #8e918b 55%, #7b7e78);
+  box-shadow: 0 0 0 1px #0a0a0a, 0 3px 6px rgba(0,0,0,.6), inset 0 1px 0 rgba(255,255,255,.35), inset 0 -1px 0 rgba(0,0,0,.25);
+}
+.nameplate b { font: 400 10px/1 var(--plate-font); letter-spacing: .2em; }
+.nameplate.dark { color: #b9bcb6; background: var(--rivet) 4px 50% / 8px 8px no-repeat, var(--rivet) calc(100% - 4px) 50% / 8px 8px no-repeat, linear-gradient(180deg, #1c1d1d, #121313); }
+.barcode {
+  height: 16px; margin-top: 2px;
+  background: repeating-linear-gradient(90deg, #1b1c1b 0 1px, transparent 1px 3px, #1b1c1b 3px 5px, transparent 5px 6px, #1b1c1b 6px 7px, transparent 7px 10px);
+  opacity: .85;
+}
+
+/* ---------- Износ корпуса и фон ---------- */
+body {
+  background:
+    radial-gradient(ellipse 60% 45% at 8% 0%, rgba(255,190,110,.07), transparent 70%),
+    radial-gradient(ellipse at 50% 20%, #191a1a, #070707 75%);
+}
+.console::after {                    /* царапины, потёртости по краям и виньетка */
+  content: "";
+  position: absolute; inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  border-radius: inherit;
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='600' height='400'%3E%3Cg stroke='white' stroke-width='.6' fill='none' opacity='.5'%3E%3Cpath d='M40 60 L130 52'/%3E%3Cpath d='M300 310 L420 330'/%3E%3Cpath d='M520 90 L560 140'/%3E%3Cpath d='M90 350 L170 342'/%3E%3Cpath d='M360 40 L430 36'/%3E%3Cpath d='M210 200 L260 214'/%3E%3C/g%3E%3C/svg%3E") 0 0 / 600px 400px,
+    radial-gradient(ellipse at 50% 50%, transparent 62%, rgba(0,0,0,.28) 100%);
+  opacity: .11;
+  mix-blend-mode: screen;
+}
+
+/* ---------- Светодиоды: волна лампового теста и мерцание ---------- */
+.led { transition: box-shadow .12s; }
+.console.lamp-test .led, .module.lamp-test .led { transition-delay: var(--d, 0s); }
+.console:not(.lamp-test) .module:not(.lamp-test) .led.on:not(.blink) { animation: led-flicker 6s steps(1) infinite; animation-delay: var(--fl, 0s); }
+@keyframes led-flicker {
+  0%, 91%, 95%, 100% { filter: none; }
+  92%, 94% { filter: brightness(.78); }
+}

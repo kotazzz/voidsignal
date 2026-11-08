@@ -1,0 +1,633 @@
+/* ---------- Кинескоп ---------- */
+.bezel {
+  padding: 14px;
+  border-radius: 18px;
+  background: linear-gradient(180deg, #161717, #0d0e0e);
+  box-shadow:
+    inset 0 0 0 1px #000,
+    inset 0 10px 20px rgba(0,0,0,.9),
+    0 1px 0 rgba(255,255,255,.05);
+}
+.crt {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  border-radius: 26px / 20px;
+  background: #020604;
+  box-shadow: 0 0 0 2px #050606;
+}
+.crt canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  animation: crt-flicker .12s infinite;
+  will-change: opacity;
+}
+.crt-glass, .crt-roll { position: absolute; inset: 0; pointer-events: none; border-radius: inherit; }
+/* полоса едет через transform (композитор), а не через background-position (перерисовка) */
+.crt-roll {
+  inset: 0 0 auto 0;
+  height: 300%;
+  background: linear-gradient(to bottom, transparent 0%, rgba(160,255,200,.035) 49%, rgba(160,255,200,.06) 50%, transparent 53%);
+  border-radius: 0;
+  will-change: transform;
+  animation: crt-roll 9s linear infinite;
+}
+.crt-glass {
+  background:
+    linear-gradient(160deg, rgba(255,255,255,.06) 0%, transparent 32%),
+    radial-gradient(ellipse at 50% 50%, transparent 60%, rgba(0,0,0,.6) 100%),
+    repeating-linear-gradient(to bottom, transparent 0 2px, rgba(0,0,0,.25) 2px 3px);   /* строчная развёртка */
+  box-shadow: inset 0 0 60px rgba(0,0,0,.8);
+}
+@keyframes crt-flicker { 0% { opacity: .96; } 50% { opacity: 1; } 100% { opacity: .98; } }
+@keyframes crt-roll { from { transform: translateY(0); } to { transform: translateY(-66.667%); } }
+
+/* ---------- 7-сегментные индикаторы за дымчатым стеклом ---------- */
+.seg-rows { display: flex; flex-direction: column; gap: 6px; }
+.seg-row { display: flex; align-items: center; gap: 8px; }
+.seg-id {
+  width: 22px;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: .08em;
+  color: var(--ink-dim);
+}
+.seg-row.moving .seg-display { animation: seg-flick .2s steps(1) infinite; }
+@keyframes seg-flick { 50% { opacity: .7; } }
+.seg-lbl {
+  font-size: 8px;
+  letter-spacing: .14em;
+  color: var(--ink-dim);
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+}
+
+.seg-display {
+  position: relative;
+  display: flex;
+  padding: 6px 8px 6px 9px;
+  border-radius: 2px;
+  background: #0c0505;
+  box-shadow:
+    inset 0 0 0 1px #000,
+    inset 0 2px 6px rgba(0,0,0,.9),
+    0 1px 0 rgba(255,255,255,.05);
+}
+.seg-display::after {           /* блик на стекле */
+  content: "";
+  position: absolute; inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(170deg, rgba(255,255,255,.07), transparent 45%);
+  pointer-events: none;
+}
+.seg-digit {
+  position: relative;
+  width: 15px;
+  height: 26px;
+  margin: 0 2.5px;
+  transform: skewX(-6deg);
+}
+.seg-display.small .seg-digit { width: 11px; height: 19px; margin: 0 2px; }
+.seg { position: absolute; background: rgba(255,60,40,.045); }
+.seg.on { background: #ff3d24; box-shadow: 0 0 4px rgba(255,50,20,.6); }
+.s-a, .s-d, .s-g {
+  left: 2px; right: 2px; height: 3px;
+  clip-path: polygon(1.5px 0, calc(100% - 1.5px) 0, 100% 50%, calc(100% - 1.5px) 100%, 1.5px 100%, 0 50%);
+}
+.s-a { top: 0; }
+.s-g { top: calc(50% - 1.5px); }
+.s-d { bottom: 0; }
+.s-b, .s-c, .s-e, .s-f {
+  width: 3px; height: calc(50% - 1.5px);
+  clip-path: polygon(50% 0, 100% 1.5px, 100% calc(100% - 1.5px), 50% 100%, 0 calc(100% - 1.5px), 0 1.5px);
+}
+.s-f { left: 0; top: 1.5px; }
+.s-b { right: 0; top: 1.5px; }
+.s-e { left: 0; bottom: 1.5px; }
+.s-c { right: 0; bottom: 1.5px; }
+.dp {
+  position: absolute;
+  right: -4.5px; bottom: 0;
+  width: 3px; height: 3px;
+  border-radius: 50%;
+  background: rgba(255,60,40,.045);
+}
+.dp.on { background: #ff3d24; }
+
+/* ---------- Светодиоды в хромированной оправе ---------- */
+.led {
+  --on: #ff3b2a;
+  --ring: 0 0 0 1.5px #070707, 0 0 0 3px #4a4d4b, 0 0 0 3.5px #1a1b1b;
+  flex: none;
+  position: relative;
+  display: inline-block;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+}
+
+.led,
+.console.off .led:not(.keep),
+.module.off .led:not(.keep) {
+  background: radial-gradient(circle at 45% 40%, color-mix(in srgb, var(--on) 22%, #000), color-mix(in srgb, var(--on) 8%, #000) 75%);
+  box-shadow: var(--ring), inset 0 1px 1px rgba(255,255,255,.12);
+  animation: none;
+}
+
+.led.on,
+.console.lamp-test .led,
+.module.lamp-test .led {
+  background: radial-gradient(circle at 42% 36%, #fff 0 1px, var(--on) 3px, color-mix(in srgb, var(--on) 75%, #000) 100%);
+  box-shadow: var(--ring), 0 0 6px var(--on), 0 0 14px color-mix(in srgb, var(--on) 40%, transparent);
+}
+.led.blink { animation: led-blink .4s steps(1) infinite; }
+.console.lamp-test .led,
+.module.lamp-test .led { animation: none; }
+@keyframes led-blink {
+  50% {
+    background: radial-gradient(circle at 45% 40%, color-mix(in srgb, var(--on) 22%, #000), color-mix(in srgb, var(--on) 8%, #000) 75%);
+    box-shadow: var(--ring);
+  }
+}
+.led.yellow { --on: #ffd23c; }
+.led.green  { --on: #46f070; }
+.led.amber  { --on: #ff9d24; }
+
+.led-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 13px 12px;
+}
+.led-cell {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  font-size: 9px;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--ink);
+}
+
+.slider {
+  position: relative;
+  width: 30px;
+  flex: none;
+  cursor: ns-resize;
+  touch-action: none;
+}
+.slider-track {
+  position: absolute; left: 50%; top: 13px; bottom: 13px;
+  width: 4px; margin-left: -2px;
+  border-radius: 2px;
+  background: #050505;
+  box-shadow: inset 0 1px 2px #000, 0 1px 0 rgba(255,255,255,.06);
+}
+.slider-knob {
+  position: absolute; left: 1px;
+  width: 28px; height: 16px; margin-top: -8px;
+  border-radius: 2px;
+  background:
+    linear-gradient(180deg, transparent 7px, rgba(0,0,0,.55) 7px 9px, transparent 9px),
+    linear-gradient(180deg, #8c8f8b, #d6d8d3 30%, #9a9d99 55%, #5e615e);
+  box-shadow: 0 0 0 1px #0a0a0a, 0 3px 5px rgba(0,0,0,.7);
+  transition: top .09s cubic-bezier(.3, 1.6, .5, 1);
+}
+
+.alnum {
+  position: relative;
+  display: flex;
+  gap: 2px;
+  padding: 3px 6px;
+  border-radius: 2px;
+  background: #0b0703;
+  box-shadow: inset 0 0 0 1px #000, inset 0 2px 5px rgba(0,0,0,.9), 0 1px 0 rgba(255,255,255,.05);
+}
+.alnum::after {
+  content: "";
+  position: absolute; inset: 0;
+  background: linear-gradient(170deg, rgba(255,255,255,.06), transparent 45%);
+  pointer-events: none;
+}
+.alnum svg { width: 10px; height: 16px; transform: skewX(-6deg); overflow: visible; }
+.alnum line { stroke: rgba(255,160,50,.06); stroke-width: 2.6; stroke-linecap: round; }
+.alnum line.on { stroke: #ffa830; filter: drop-shadow(0 0 1.5px rgba(255,150,40,.8)); }
+.mini-btn {
+  margin-left: auto;
+  width: 34px; height: 18px;
+  border: 0;
+  border-radius: 3px;
+  font: 600 8px/1 var(--sans);
+  letter-spacing: .14em;
+  color: #b9bcb6;
+  cursor: pointer;
+  background: linear-gradient(180deg, #353837, #242625);
+  box-shadow: 0 0 0 1px #090a0a, 0 2px 0 #0f1010, inset 0 1px 0 rgba(255,255,255,.08);
+  transition: transform .05s;
+}
+.mini-btn:active { transform: translateY(1.5px); box-shadow: 0 0 0 1px #090a0a, 0 0.5px 0 #0f1010; }
+
+/* ---------- Кнопки ---------- */
+.btn-panel { display: flex; flex-direction: column; justify-content: center; gap: 12px; }
+.btn {
+  position: relative;
+  width: 100%;
+  height: 40px;
+  padding: 0 16px;
+  border: 0;
+  border-radius: 4px;
+  text-align: left;
+  font: 600 9.5px/1 var(--sans);
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: #cfd1cb;
+  cursor: pointer;
+  background: linear-gradient(180deg, #353837 0%, #292b2a 55%, #232524 100%);
+  box-shadow:
+    0 0 0 1px #090a0a,
+    0 3px 0 #0f1010,
+    0 5px 8px rgba(0,0,0,.45),
+    inset 0 1px 0 rgba(255,255,255,.09);
+  transition: transform .05s;
+}
+.btn:active, .btn.pressed {
+  transform: translateY(2px);
+  box-shadow:
+    0 0 0 1px #090a0a,
+    0 1px 0 #0f1010,
+    0 2px 3px rgba(0,0,0,.45),
+    inset 0 1px 0 rgba(255,255,255,.05);
+}
+
+/* ---------- Тумблеры ---------- */
+.sw-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  height: 100%;
+  align-items: center;
+  justify-items: center;
+}
+.sw-col { display: flex; flex-direction: column; align-items: center; gap: 12px; }
+.sw-label { font-size: 10px; font-weight: 600; letter-spacing: .2em; color: var(--ink); }
+.toggle {
+  position: relative;
+  width: 50px;
+  height: 92px;
+  border: 0;
+  background: none;
+  cursor: pointer;
+}
+.t-on, .t-off {
+  position: absolute; left: 0; right: 0;
+  font: 600 8px var(--sans);
+  letter-spacing: .2em;
+  color: var(--ink-dim);
+}
+.t-on { top: 0; }
+.t-off { bottom: 0; }
+.toggle .washer {
+  position: absolute; left: 50%; top: 50%;
+  width: 34px; height: 34px; margin: -17px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 50% 40%, #3a3c3b, #1b1c1c 70%);
+  box-shadow: 0 0 0 1px #000, inset 0 1px 0 rgba(255,255,255,.08);
+}
+.toggle .nut {
+  position: absolute; left: 50%; top: 50%;
+  width: 22px; height: 22px; margin: -11px;
+  clip-path: polygon(25% 3%, 75% 3%, 100% 50%, 75% 97%, 25% 97%, 0 50%);
+  background: linear-gradient(160deg, #d5d7d3, #7c7f7c 45%, #3d3f3e 70%, #8a8d8a);
+  z-index: 1;
+}
+.toggle .lever {
+  position: absolute; left: 50%;
+  top: 46px;
+  width: 8px; height: 28px; margin-left: -4px;
+  border-radius: 2px 2px 5px 5px;
+  background: linear-gradient(90deg, #6f726f, #f1f2ee 40%, #a9aca8 60%, #5d605d);
+  clip-path: polygon(15% 0, 85% 0, 100% 100%, 0 100%);
+  z-index: 2;
+  transition: top .08s, transform .08s;
+  filter: drop-shadow(0 4px 3px rgba(0,0,0,.6));
+}
+.toggle .lever::after {
+  content: "";
+  position: absolute; left: 0; right: 0; bottom: 0; height: 5px;
+  background: rgba(255,255,255,.35);
+}
+.toggle.on .lever {
+  top: 18px;
+  transform: scaleY(-1);
+}
+
+/* ---------- Питание: всё погашено / проверка индикаторов ---------- */
+.console.off .seg.on,
+.module.off .seg.on,
+.console.off .dp.on,
+.module.off .dp.on { background: rgba(255,60,40,.045); box-shadow: none; }
+.console.off .alnum line.on,
+.module.off .alnum line.on { stroke: rgba(255,160,50,.06); filter: none; }
+.console.off .seg-display,
+.module.off .seg-display { animation: none; }
+.console.lamp-test .seg,
+.module.lamp-test .seg,
+.console.lamp-test .dp,
+.module.lamp-test .dp { background: #ff3d24; box-shadow: 0 0 4px rgba(255,50,20,.6); }
+.console.lamp-test .alnum line,
+.module.lamp-test .alnum line { stroke: #ffa830; filter: drop-shadow(0 0 1.5px rgba(255,150,40,.8)); }
+
+/* ---------- Светофорная шкала ---------- */
+.lbar {
+  display: flex;
+  gap: 3px;
+  padding: 5px;
+  border-radius: 3px;
+  background: var(--well);
+  box-shadow: inset 0 0 0 1px #000, inset 0 2px 5px rgba(0,0,0,.8), 0 1px 0 rgba(255,255,255,.04);
+}
+.lbar.vert { flex-direction: column-reverse; }
+.lbar-seg {
+  --c: #ff3b2a;
+  flex: 1;
+  min-width: 4px;
+  height: 10px;
+  border-radius: 1px;
+  background: color-mix(in srgb, var(--c) 10%, #0b0b0b);
+}
+.lbar.vert .lbar-seg { width: 18px; height: auto; min-height: 4px; }
+.lbar-seg.yel { --c: #ffd23c; }
+.lbar-seg.grn { --c: #46f070; }
+.lbar-seg.on { background: var(--c); box-shadow: 0 0 5px color-mix(in srgb, var(--c) 55%, transparent); }
+
+/* ---------- Галетный переключатель ---------- */
+/* Вращаются только риски и указатель; освещение и тень — на неподвижных слоях */
+.rotary {
+  --size: 104px;
+  position: relative;
+  width: var(--size);
+  height: var(--size);
+}
+.rot-lbl, .rot-tick {
+  position: absolute; left: 50%; top: 50%;
+  transform: rotate(var(--a)) translateY(calc(var(--size) * -.5));
+}
+.rot-lbl { width: 0; height: 0; cursor: pointer; }
+.rot-lbl b {
+  position: absolute;
+  left: 0; top: 0;
+  transform: translate(-50%, -60%) rotate(calc(-1 * var(--a)));
+  font: 600 9px/1 var(--sans);
+  letter-spacing: .06em;
+  color: var(--ink);
+  white-space: nowrap;
+}
+.rot-tick {
+  width: 2px; height: 5px; margin-left: -1px;
+  background: #5c605b;
+  transform: rotate(var(--a)) translateY(calc(var(--size) * -.5 + 14px));
+}
+.rot-knob {
+  --rot: 0deg;
+  position: absolute; left: 50%; top: 50%;
+  width: 60px; height: 60px; margin: -30px;
+  border-radius: 50%;
+  cursor: pointer;
+  touch-action: none;
+  background: radial-gradient(circle at 42% 34%, #4a4d4b, #232524 62%, #121313);
+  box-shadow: 0 0 0 1px #000, 0 6px 10px rgba(0,0,0,.65), inset 0 1px 0 rgba(255,255,255,.12);
+}
+.rot-grooves, .rot-arm {
+  position: absolute; inset: 0;
+  border-radius: 50%;
+  transform: rotate(var(--rot));
+  transition: transform .12s cubic-bezier(.3, 1.5, .5, 1);
+}
+.rot-grooves { background: repeating-conic-gradient(rgba(0,0,0,.4) 0 3deg, transparent 3deg 30deg); }
+.rot-face {
+  position: absolute; inset: 10px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 45% 36%, #3f4240, #1c1d1d 72%);
+  box-shadow: inset 0 0 0 1px rgba(0,0,0,.6), 0 1px 0 rgba(255,255,255,.06);
+}
+.rot-pointer {
+  position: absolute; left: 50%; top: 3px;
+  width: 4px; height: 22px; margin-left: -2px;
+  border-radius: 2px;
+  background: #d9dbd6;
+  box-shadow: 0 0 0 1px rgba(0,0,0,.5);
+}
+
+/* ---------- Бесконечная крутилка ---------- */
+.encoder {
+  --rot: 0deg;
+  position: relative;
+  width: 104px;
+  height: 104px;
+  border-radius: 50%;
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-user-drag: none;
+}
+.encoder * { pointer-events: none; }
+.encoder:active { cursor: grabbing; }
+.enc-skirt {
+  position: absolute; inset: 0;
+  border-radius: 50%;
+  background: radial-gradient(circle, #101111 64%, #2a2c2b 66%, #161717 72%);
+  box-shadow: inset 0 0 0 1px #000, 0 1px 0 rgba(255,255,255,.05);
+}
+.enc-cap {
+  position: absolute; inset: 9px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 40% 32%, #5a5d5b, #2a2c2b 55%, #151616);
+  box-shadow: 0 8px 14px rgba(0,0,0,.7), 0 0 0 1px #050505, inset 0 -4px 8px rgba(0,0,0,.6);
+}
+.enc-knurl, .enc-arm {
+  position: absolute; inset: 9px;
+  border-radius: 50%;
+  transform: rotate(var(--rot));
+  transition: transform .09s cubic-bezier(.3, 1.5, .5, 1);
+}
+.enc-knurl { background: repeating-conic-gradient(rgba(0,0,0,.4) 0 calc(var(--detent, 6deg) / 3), transparent calc(var(--detent, 6deg) / 3) var(--detent, 6deg)); }
+.enc-face {
+  position: absolute; inset: 21px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 42% 34%, #484b49, #222423 70%);
+  box-shadow: 0 0 0 1px rgba(0,0,0,.6), inset 0 1px 0 rgba(255,255,255,.1);
+}
+.enc-dimple {                 /* лунка под палец: тень лунки не вращается вместе с ручкой */
+  position: absolute; left: 50%; top: 18px;
+  width: 15px; height: 15px; margin-left: -7.5px;
+  border-radius: 50%;
+  transform: rotate(calc(-1 * var(--rot)));
+  transition: transform .09s cubic-bezier(.3, 1.5, .5, 1);
+  background: radial-gradient(circle at 50% 65%, #3c3f3d, #111212 80%);
+  box-shadow: inset 0 2px 3px rgba(0,0,0,.9), 0 1px 0 rgba(255,255,255,.08);
+}
+
+/* ---------- Горизонтальный ползунок ---------- */
+.hslider { position: relative; width: 100%; }
+.hs-rail { position: relative; height: 30px; cursor: ew-resize; touch-action: none; }
+.hs-track {
+  position: absolute; left: 14px; right: 14px; top: 50%;
+  height: 4px; margin-top: -2px;
+  border-radius: 2px;
+  background: #050505;
+  box-shadow: inset 0 1px 2px #000, 0 1px 0 rgba(255,255,255,.06);
+}
+.hs-notch {
+  position: absolute; top: 3px;
+  width: 2px; height: 5px; margin-left: -1px;
+  background: #5c605b;
+}
+.hs-knob {
+  position: absolute; top: 50%;
+  width: 18px; height: 28px; margin: -14px 0 0 -9px;
+  border-radius: 2px;
+  background:
+    linear-gradient(90deg, transparent 8px, rgba(0,0,0,.55) 8px 10px, transparent 10px),
+    linear-gradient(90deg, #8c8f8b, #d6d8d3 30%, #9a9d99 55%, #5e615e);
+  box-shadow: 0 0 0 1px #0a0a0a, 0 3px 5px rgba(0,0,0,.7);
+  transition: left .09s cubic-bezier(.3, 1.6, .5, 1);
+}
+.hs-labels { position: relative; height: 30px; margin-top: 4px; }
+.hs-labels span {
+  position: absolute; top: 0;
+  display: flex; flex-direction: column; align-items: center; gap: 4px;
+  transform: translateX(-50%);
+  font: 600 8.5px/1 var(--sans);
+  letter-spacing: .16em;
+  color: var(--ink);
+  cursor: pointer;
+}
+.hs-labels svg { width: 24px; height: 12px; fill: none; stroke: currentColor; stroke-width: 1.6; }
+
+/* ---------- Кнопки с фиксацией ---------- */
+.latch-group { display: flex; gap: 6px; }
+.latch {
+  flex: 1;
+  height: 46px;
+  border: 0;
+  border-radius: 3px;
+  cursor: pointer;
+  color: #c9cbc5;
+  background: linear-gradient(180deg, #3a3d3c 0%, #2b2d2c 55%, #242625 100%);
+  box-shadow: 0 0 0 1px #090a0a, 0 5px 0 #0f1010, 0 7px 9px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.1);
+  transition: transform .05s;
+}
+.latch:active { transform: translateY(3px); }
+.latch.latched {
+  transform: translateY(4px);
+  background: linear-gradient(180deg, #2a2c2b, #232524);
+  box-shadow: 0 0 0 1px #090a0a, 0 1px 0 #0f1010, inset 0 2px 4px rgba(0,0,0,.6);
+}
+.latch-cap {
+  display: flex; flex-direction: column; align-items: center; gap: 4px;
+  font: 600 7.5px/1 var(--sans);
+  letter-spacing: .18em;
+}
+.latch-cap b { font: 400 16px/1 Georgia, serif; letter-spacing: 0; }
+.console.off .lbar-seg.on,
+.module.off .lbar-seg.on { background: color-mix(in srgb, var(--c) 10%, #0b0b0b); box-shadow: none; }
+.console.lamp-test .lbar-seg,
+.module.lamp-test .lbar-seg { background: var(--c); box-shadow: 0 0 5px color-mix(in srgb, var(--c) 55%, transparent); }
+
+/* ---------- Накопители ---------- */
+.drive-bay {
+  position: relative;
+  width: 112px;
+  height: 38px;
+  padding: 3px;
+  overflow: hidden;
+  border-radius: 3px;
+  cursor: pointer;
+  background: #070808;
+  box-shadow: inset 0 0 0 1px #000, inset 0 4px 8px rgba(0,0,0,.95), 0 1px 0 rgba(255,255,255,.05);
+}
+.drive-bay::before {          /* щель приёмника */
+  content: "";
+  position: absolute; left: 10px; right: 10px; top: 50%;
+  height: 2px; margin-top: -1px;
+  background: #000;
+  box-shadow: 0 1px 0 rgba(255,255,255,.05);
+}
+.drive {
+  position: relative;
+  display: none;
+  height: 100%;
+  border-radius: 2px;
+  background: linear-gradient(180deg, #3a3d3b, #262827 60%, #1d1f1e);
+  box-shadow: 0 0 0 1px #050505, inset 0 1px 0 rgba(255,255,255,.12), 0 2px 3px rgba(0,0,0,.6);
+}
+.drive-bay.loaded .drive { display: block; }
+.drive-label {
+  position: absolute; left: 5px; right: 12px; top: 3px; height: 15px;
+  display: grid; place-items: center;
+  border-radius: 1px;
+  font: 600 8px/1 var(--mono);
+  letter-spacing: .06em;
+  color: #2b2a24;
+  background: linear-gradient(180deg, #d9d3bf, #bdb7a3);
+  white-space: nowrap;
+  overflow: hidden;
+}
+.drive-notch {
+  position: absolute; right: 4px; top: 5px; bottom: 5px;
+  width: 5px;
+  border-radius: 1px;
+  background: repeating-linear-gradient(180deg, #111 0 2px, #3a3d3b 2px 3px);
+}
+/* индикаторы картриджа: записан сигнал + уровни обработки L1–L3 */
+.drive-leds { position: absolute; left: 6px; bottom: 3px; display: flex; align-items: center; gap: 4px; }
+.drive-leds b { width: 6px; }
+.dl {
+  display: block;
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: #121413;
+  box-shadow: inset 0 0 0 1px #000;
+  --c: #46f070;
+}
+.dl.rec { --c: #ff6a2a; }
+.dl.l2 { --c: #ffd23c; }
+.dl.l3 { --c: #58c8ff; }
+.dl.on { background: var(--c); box-shadow: 0 0 5px var(--c); }
+
+/* крышка слота: сама закрывается, когда накопитель вставлен */
+.drive-lid {
+  position: absolute; inset: 2px;
+  display: grid; place-items: center;
+  border-radius: 2px;
+  background: repeating-linear-gradient(90deg, rgba(255,255,255,.03) 0 1px, transparent 1px 3px), linear-gradient(180deg, #4a4d4b, #2e302f 55%, #232524);
+  box-shadow: 0 0 0 1px #050505, inset 0 1px 0 rgba(255,255,255,.14), 0 2px 4px rgba(0,0,0,.6);
+  transform: translateX(-108%);
+  transition: transform .35s cubic-bezier(.5, 0, .2, 1);
+}
+.drive-bay.closed .drive-lid { transform: none; }
+.drive-bay.closed { cursor: not-allowed; }
+.lid-grip { width: 38%; height: 4px; border-radius: 2px; background: #151616; box-shadow: inset 0 1px 2px #000, 0 1px 0 rgba(255,255,255,.1); }
+body.carrying, body.carrying .drive-bay:not(.closed) { cursor: copy; }
+
+/* слот панели: индикаторы слева, кнопки справа, шкала передачи внизу */
+.drive-slot { display: flex; flex-direction: column; gap: 12px; }
+.ds-row { display: flex; align-items: center; gap: 9px; }
+.ds-leds { display: flex; flex-direction: column; gap: 9px; }
+.ds-bay { flex: 1; min-width: 0; }
+.ds-bay .drive-bay { width: 100%; height: 44px; }
+.ds-btn { width: 30px; height: 34px; margin: 0; display: grid; place-items: center; }
+.ds-btn svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+
+/* кнопки проигрывателя */
+.transport .latch { display: grid; place-items: center; height: 44px; }
+.transport .latch svg { width: 22px; height: 15px; fill: currentColor; }
+
+/* трактовка: галетник и столбец индикаторов */
+.interp { display: flex; flex-direction: column; align-items: center; gap: 12px; }
+.led-list { align-self: stretch; display: flex; flex-direction: column; gap: 10px; padding: 0 8px; }
+
+/* индикаторы в два столбца: [●] текст ······ текст [●], справа выравнивание по правому краю */
+.led-grid .led-cell, .t-acq .led-row .led-cell { gap: 10px; }
+.led-grid .led-cell > span:not(.led), .t-acq .led-row .led-cell > span:not(.led) { flex: 1; }
+.led-grid .led-cell:nth-child(even), .t-acq .led-row .led-cell:nth-child(even) { flex-direction: row-reverse; text-align: right; }

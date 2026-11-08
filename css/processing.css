@@ -1,0 +1,96 @@
+/* ================= Панели «Воспроизведение» и «Обработка»: общая сетка ================= */
+.mod-processing {
+  display: grid;
+  grid-template-columns: 272px minmax(0, 1fr) 272px;
+  grid-template-areas: "src out lis" "proc proc proc";
+  gap: 14px;
+  padding-bottom: 14px;
+}
+.a-lis { grid-area: lis; }
+.mod-processing .a-out .crt.fill { min-height: 330px; }
+.proc-cols { display: grid; grid-template-columns: 1fr 1.1fr 1fr; gap: 36px; }
+.proc-col { display: flex; flex-direction: column; gap: 16px; }
+.proc-col .dc-group + .dc-group { padding-top: 16px; }
+.mod-playback {
+  display: grid;
+  grid-template-columns: 272px minmax(0, 1fr) 272px;
+  grid-template-areas: "src out proc" "ctl ctl proc";
+  gap: 14px;
+  padding-bottom: 14px;
+}
+.a-ctl { grid-area: ctl; }
+.ctl-row { display: flex; align-items: center; justify-content: space-around; gap: 40px; }
+.ctl-row .dc-group + .dc-group { border-top: 0; padding-top: 0; }
+.ctl-row .interp { flex-direction: row; gap: 26px; }
+.ctl-row .interp .led-list { align-self: center; padding: 0; }
+.ctl-row .transport { min-width: 300px; }
+.mod-playback .a-out .crt.fill { min-height: 300px; }
+.a-src { grid-area: src; }
+.a-out { grid-area: out; }
+.a-proc { grid-area: proc; }
+.a-out { place-items: stretch; }
+
+.dc-side { display: flex; flex-direction: column; gap: 16px; }
+.dc-group.grow { flex: 1; }
+.dc-group.grow > .dc-sub + * { margin-top: auto; }   /* содержимое — по центру свободного места */
+.dc-group.grow > :last-child { margin-bottom: auto; }
+.dc-group { display: flex; flex-direction: column; gap: 12px; }
+.dc-group + .dc-group {
+  padding-top: 16px;
+  border-top: 1px solid rgba(0,0,0,.55);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.035);
+}
+.dc-id, .dc-row { display: flex; align-items: center; gap: 10px; }
+.dc-id .mini-btn { width: 34px; }
+.dc-row .btn { flex: 1; }
+.dc-metrics {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 8px 12px;
+}
+.dc-rotary { display: grid; place-items: center; padding: 14px 0 4px; }
+.dc-rotary .rotary { --size: 150px; }
+.interp .dc-rotary { padding: 10px 0 0; }
+.dc-rotary .rot-knob { width: 84px; height: 84px; margin: -42px; }
+.dc-rotary .rot-pointer { height: 28px; }
+.dc-stages { display: flex; flex-direction: column; }
+
+/* матричный индикатор архива: строки 16-сегментных знаков */
+.dc-matrix {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 6px;
+  border-radius: 3px;
+  background: #0b0703;
+  box-shadow: inset 0 0 0 1px #000, inset 0 2px 5px rgba(0,0,0,.9), 0 1px 0 rgba(255,255,255,.05);
+}
+.dc-matrix .alnum { padding: 2px 4px; gap: 3px; background: none; box-shadow: none; justify-content: center; }
+.dc-matrix .alnum::after { display: none; }
+.dc-matrix .alnum svg { width: 13px; height: 21px; }
+.dc-browse { display: flex; align-items: center; gap: 14px; }
+.dc-browse .dc-metrics { flex: 1; grid-template-columns: 1fr auto; }
+.dc-browse .encoder { width: 84px; height: 84px; }
+.led-row.three { grid-template-columns: 1fr 1fr; }
+.dc-stages { gap: 10px; }
+.dc-stage { display: grid; grid-template-columns: 1fr 104px; align-items: center; gap: 10px; }
+.dc-stage .lbar { padding: 3px; gap: 2px; }
+.dc-stage .lbar-seg { height: 7px; min-width: 3px; }
+.a-proc .latch-group .latch { height: 40px; }
+.a-proc .latch-cap { font-size: 7px; letter-spacing: .1em; }
+
+.ds-bay .drive-label { font-size: 10px; }
+/* банк из семи слотов */
+.ds-bank { display: flex; flex-direction: column; gap: 7px; }
+.drive-slot.compact .ds-row { gap: 7px; }
+.drive-slot.compact .ds-leds { gap: 5px; }
+.drive-slot.compact .ds-bay .drive-bay { height: 32px; }
+.drive-slot.compact .drive-label { font-size: 8px; height: 12px; }
+.drive-slot.compact .ds-btn { width: 26px; height: 28px; }
+.a-src .alnum.lg { justify-content: center; }
+
+/* уровень обработки */
+.dc-level { display: flex; align-items: center; gap: 14px; }
+.dc-level-leds { display: flex; gap: 12px; margin-left: auto; }
+.dc-group.bottom { margin-top: auto; }

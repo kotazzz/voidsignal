@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VoidSignal</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=VT323&family=Share+Tech+Mono&family=Michroma&display=swap">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/widgets.css">
+  <link rel="stylesheet" href="css/home.css">
+  <link rel="stylesheet" href="css/radar.css">
+  <link rel="stylesheet" href="css/tuner.css">
+  <link rel="stylesheet" href="css/playback.css">
+  <link rel="stylesheet" href="css/processing.css">
+  <link rel="stylesheet" href="css/dishes.css">
+  <link rel="stylesheet" href="css/debug.css">
+  <link rel="stylesheet" href="css/retro.css">
+</head>
+<body>
+  <div class="console off" id="console">
+    <header class="brand">
+      <div class="brand-text">
+        <span class="brand-name">VOIDSIGNAL</span>
+        <span class="brand-model">VS-3 · Deep sky triangulator</span>
+      </div>
+      <div class="drive-rack">
+        <span class="rack-caption">Накопители</span>
+        <div class="rack-bays" id="rackBays"></div>
+        <div class="rack-hand"><span class="rack-caption">В руке</span><span class="hand-drive" id="handDrive"></span></div>
+      </div>
+    </header>
+
+    <div class="deck">
+      <nav class="tabs" id="tabs"></nav>
+      <main class="modules" id="modules"></main>
+    </div>
+
+    <footer class="hints" id="hints"></footer>
+  </div>
+
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>

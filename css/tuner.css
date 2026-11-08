@@ -1,0 +1,94 @@
+/* ================= Модуль «Настройка» ================= */
+.mod-tuner {
+  display: grid;
+  grid-template-columns: 272px minmax(0, 1fr) minmax(0, 1fr) 272px;
+  grid-template-rows: auto 1fr;
+  grid-template-areas:
+    "acq  mon   polar tele"
+    "freq scope scope pol";
+  gap: 14px;
+  padding-bottom: 14px;
+}
+.a-acq { grid-area: acq; }
+.a-mon { grid-area: mon; }
+.a-polar { grid-area: polar; }
+.a-tele { grid-area: tele; }
+.a-freq { grid-area: freq; }
+.a-scope { grid-area: scope; }
+.a-pol { grid-area: pol; }
+
+.ctl-cap, .t-unit {
+  font-size: 8.5px;
+  font-weight: 600;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: var(--ink-dim);
+}
+.t-unit { letter-spacing: .1em; text-transform: none; }
+
+/* ---------- наводка ---------- */
+.t-acq { display: flex; flex-direction: column; justify-content: space-between; gap: 14px; }
+.acq-id, .acq-cmd { display: flex; align-items: center; gap: 10px; }
+.alnum.lg { flex: 1; justify-content: center; padding: 6px 8px; gap: 3px; }
+.alnum.lg svg { width: 17px; height: 28px; }
+.id-field { cursor: text; }
+.id-field.editing { box-shadow: inset 0 0 0 1px #000, inset 0 2px 5px rgba(0,0,0,.9), 0 0 0 1px rgba(255,166,40,.45); }
+.acq-cmd .btn { flex: 1; }
+.mini-btn.tall { height: 40px; width: 46px; margin-left: 0; }
+.acq-track { display: flex; align-items: center; gap: 14px; }
+.acq-track .lbar { flex: 1; }
+.led-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.t-acq .led-row { gap: 12px 18px; }
+
+/* ---------- экраны ---------- */
+.t-screen { display: grid; place-items: center; }
+.a-mon .bezel { width: min(100%, 300px); padding: 10px; border-radius: 14px; }
+.crt.bw { background: #060606; border-radius: 18px / 14px; }
+.crt.bw canvas {
+  image-rendering: pixelated;
+  animation: crt-flicker .1s infinite;
+}
+.round-bezel {
+  width: min(100%, 226px);
+  padding: 12px;
+  border-radius: 50%;
+  background: linear-gradient(180deg, #161717, #0d0e0e);
+  box-shadow: inset 0 0 0 1px #000, inset 0 10px 20px rgba(0,0,0,.9), 0 1px 0 rgba(255,255,255,.05);
+}
+.crt.round { aspect-ratio: 1; border-radius: 50%; }
+/* осциллограф занимает всю ячейку; разрешение холста подстраивается под размер */
+.a-scope { place-items: stretch; }
+.bezel.fill { display: flex; min-height: 0; }
+.crt.fill { flex: 1; aspect-ratio: auto; min-height: 200px; border-radius: 18px / 14px; }
+.crt.fill canvas { position: absolute; inset: 0; }
+
+/* ---------- телеметрия ---------- */
+.t-tele { display: flex; flex-direction: column; justify-content: space-between; gap: 12px; }
+.tele-grid {
+  display: grid;
+  grid-template-columns: 76px auto 1fr;
+  align-items: center;
+  gap: 8px 12px;
+}
+.tele-status { display: flex; }
+.tele-status .alnum { flex: 1; justify-content: center; }
+.tele-status .alnum svg { width: 12px; height: 19px; }
+.tele-save { display: flex; align-items: center; gap: 16px; }
+.tele-save .btn { flex: 1; }
+.tele-leds { display: flex; flex-direction: column; gap: 9px; }
+
+/* ---------- органы подстройки ---------- */
+.t-ctl { display: flex; flex-direction: column; justify-content: space-between; gap: 14px; }
+.ctl-readout { display: flex; align-items: center; justify-content: center; gap: 8px; }
+.ctl-match { display: flex; flex-direction: column; gap: 6px; }
+.ctl-knobs { display: flex; align-items: flex-end; justify-content: space-between; padding-top: 14px; }
+.ctl-knob { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+.ctl-type {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding-top: 14px;
+  border-top: 1px solid rgba(0,0,0,.55);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.035);
+}
+.ctl-type-head { display: flex; align-items: center; justify-content: space-between; }

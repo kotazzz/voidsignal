@@ -1,0 +1,5 @@
+/* ================= Модуль «Воспроизведение» =================
+   Сетка и группы общие с обработкой (css/processing.css). */
+.btn.big { height: 54px; text-align: center; font-size: 11px; }
+.mod-playback .dc-matrix .alnum svg { width: 12px; height: 19px; }
+.mod-playback [data-ref=vu] .lbar-seg { height: 14px; }
